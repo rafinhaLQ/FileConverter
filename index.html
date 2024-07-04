@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>File Converter</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7199550905545279"
+        crossorigin="anonymous"></script>
+    <style>
+        /* CSS rules for the header element */
+        .header {
+            background-color: #007B9E;
+            color: #fff;
+            text-align: center;
+            padding: 5px;
+            width: 100%;
+            /* Add this line to make the header fill the entire width */
+            margin: 0;
+            /* Add this line to remove any default margin */
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            /* Garante que o header fique acima de outros elementos */
+        }
+
+        .header h1 {
+            color: #fff;
+        }
+
+        /* CSS rules for the subtitle element */
+        .subtitle {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .subtitle h2 {
+            color: #333;
+        }
+
+        /* CSS rules for the byteArrayDisplay element */
+        #byteArrayDisplay {
+            width: 70%;
+            /* Adjust the width as needed */
+            height: 200px;
+            /* Set a fixed height */
+            overflow: auto;
+            /* Enable scrolling */
+            background-color: #f0f0f0bd;
+            /* Optional: background color */
+            border: 1px solid #ccc;
+            /* Optional: border */
+            margin: 20px auto;
+            text-align: center;
+            /* Optional: padding */
+            white-space: pre-wrap;
+            /* Preserve whitespace and allow normal wrap */
+            word-wrap: break-word;
+            /* Allow long words to be able to break and wrap to the next line */
+        }
+
+        body {
+            padding-top: 60px;
+            margin: 20px;
+            font-family: 'Roboto', sans-serif;
+            background-color: #8dbecc;
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        #dragOrUpdate {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+        }
+
+        #dragOrUpdate:hover {
+            background-color: #45a049;
+            /* Cor de fundo mais escura ao passar o mouse */
+        }
+
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"][disabled] {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        input[type="submit"]:not([disabled]):hover {
+            background-color: #45a049;
+        }
+
+        #copyButton {
+            background-color: #008CBA;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            margin: auto 20%;
+            transition: background-color 0.3s;
+            /* Initially hidden */
+        }
+
+        #copyButton:hover {
+            background-color: #007B9E;
+        }
+
+        pre {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            overflow: auto;
+        }
+
+        #horizontal-ad {
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .buttons-container {
+            display: flex;
+            /* Alinha os elementos horizontalmente */
+            justify-content: space-between;
+            /* Espaçamento entre os elementos */
+            align-items: center;
+            /* Centraliza os elementos verticalmente */
+            margin-bottom: 20px auto;
+            /* Margem para separar do próximo conteúdo */
+            padding: 0 20%;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #f0f0f0;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('uploadForm').addEventListener('submit', function (e) {
+                e.preventDefault(); // Prevent the default form submission
+                var fileInput = document.getElementById('fileUpload');
+                var file = fileInput.files[0]; // Get the file
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    var arrayBuffer = reader.result;
+                    // For example, convert arrayBuffer to byte array if needed
+                    var byteArray = new Uint8Array(arrayBuffer);
+                    console.log(byteArray);
+                    var byteString = '[';
+                    byteArray.forEach((byte) => {
+                        byteString += byte + ', '; // Adiciona um espaço entre cada byte para melhor visualização
+                    });
+                    byteString = byteString.slice(0, -2) + ']'; // Remove a última vírgula e espaço e adiciona um colchete de fechamento
+                    // Displaying the result on the screen
+                    document.getElementById('byteArrayDisplay').textContent = byteString;
+                    // Torna o botão visível
+                    document.getElementById('copyButton').style.display = 'inline-block';
+                };
+
+                reader.readAsArrayBuffer(file); // Read the file as an array buffer
+            });
+            document.getElementById('copyButton').addEventListener('click', function () {
+                var byteString = document.getElementById('byteArrayDisplay').textContent;
+                navigator.clipboard.writeText(byteString).then(function () {
+                    console.log('Texto copiado com sucesso!');
+                }).catch(function (error) {
+                    console.error('Erro ao copiar texto: ', error);
+                });
+            });
+            document.getElementById('fileUpload').addEventListener('change', function () {
+                if (this.files.length > 0) {
+                    // Há pelo menos um arquivo selecionado
+                    document.getElementById('convertButton').disabled = false; // Ativa o botão
+                    document.getElementById('fileNameDisplay').textContent = this.files[0].name;
+                    // document.getElementById('convertButton').style.backgroundColor = "#4CAF50"; // Muda a cor de volta para verde
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <header class="header">
+        <h1>FILE CONVERTER</h1>
+    </header>
+    <div class="subtitle">
+        <h2>CONVERT FILE TO BYTE ARRAY</h2>
+    </div>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <div class="buttons-container">
+            <button id="dragOrUpdate" onclick="document.getElementById('fileUpload').click()">Drag and Drop or Upload
+                your File</button>
+            <input type="file" id="fileUpload" name="fileUpload" style="display:none">
+            <p id="fileNameDisplay"></p>
+            <input type="submit" value="Convert File" id="convertButton" disabled>
+        </div>
+    </form>
+    <pre id="byteArrayDisplay"></pre>
+    <button id="copyButton">Copy</button>
+
+    <div class="ad" id="horizontal-ad">
+        <!-- converter-add-horizontal -->
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7199550905545279"
+            data-ad-slot="1286375246" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+
+    <footer>
+        <p>This site was created by Rafael Luz - find me on <a href="https://github.com/rafinhaLQ"
+                target="_blank">GitHub</a> and <a href="https://www.linkedin.com/in/rafaelluzdequeiroz/"
+                target="_blank">LinkedIn</a>.</p>
+    </footer>
+</body>
+
+</html>
